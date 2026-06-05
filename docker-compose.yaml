@@ -35,13 +35,20 @@ networks:
 volumes:
   coolify-local-backup:
     name: coolify-local-backup
+    external: true
   coolify-logs:
     name: coolify-logs
+    external: true
   coolify-db:
     name: coolify-db
+    external: true
   coolify-ssl-certs:
     name: coolify-ssl-certs
+    external: true
   coolify-letsencrypt:
     name: coolify-letsencrypt
+    external: true
   coolify-traefik-letsencrypt:
     name: coolify-traefik-letsencrypt
+    external: true
+

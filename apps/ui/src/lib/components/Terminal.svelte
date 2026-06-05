@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import '@xterm/xterm/css/xterm.css';
 	import { io } from '$lib/store';
 	import { get } from '$lib/api';
 	import { errorNotification } from '$lib/common';
 
-	// Props
-	export let resourceType: 'application' | 'service' | 'database'; // which API endpoint to hit
-	export let resourceId: string;  // application/service/database id
+	export let resourceType: 'application' | 'service' | 'database';
+	export let resourceId: string;
 
-	// ── State ────────────────────────────────────────────────────────────
-	let terminal: any = null;        // xterm.js Terminal instance
+	let terminal: any = null;
 	let fitAddon: any = null;
 	let terminalEl: HTMLElement;
 	let wrapperEl: HTMLElement;
@@ -25,7 +22,6 @@
 	let loadingContainers = false;
 	let fullscreen = false;
 
-	// ── Load containers list ─────────────────────────────────────────────
 	async function loadContainers() {
 		loadingContainers = true;
 		try {
@@ -46,18 +42,18 @@
 		}
 	}
 
-	// ── Init xterm ───────────────────────────────────────────────────────
 	async function initTerminal() {
-		// Dynamically import xterm so it only loads when the terminal tab is visited
 		const { Terminal } = await import('@xterm/xterm');
 		const { FitAddon } = await import('@xterm/addon-fit');
+		await import('@xterm/xterm/css/xterm.css');
 
 		terminal = new Terminal({
 			cursorBlink: true,
 			fontSize: 14,
 			fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+			disableStdin: true,
 			theme: {
-				background: '#0d0d0d',
+				background: '#000000',
 				foreground: '#e0e0e0',
 				cursor: '#a0a0a0'
 			},
@@ -67,7 +63,6 @@
 		fitAddon = new FitAddon();
 		terminal.loadAddon(fitAddon);
 		terminal.open(terminalEl);
-		// Wait one frame so the container has rendered dimensions before fitting
 		await new Promise((r) => requestAnimationFrame(r));
 		fitAddon.fit();
 
@@ -86,11 +81,12 @@
 		io.emit('terminal:resize', { cols: terminal.cols, rows: terminal.rows });
 	}
 
-	// ── Socket events ────────────────────────────────────────────────────
 	function setupSocketListeners() {
 		io.on('terminal:ready', () => {
 			status = 'connected';
+			if (terminal) terminal.options.disableStdin = false;
 			terminal?.focus();
+			fitAddon?.fit();
 		});
 
 		io.on('terminal:data', ({ data }: { data: string }) => {
@@ -99,12 +95,14 @@
 
 		io.on('terminal:exit', ({ exitCode }: { exitCode: number }) => {
 			status = 'exited';
+			if (terminal) terminal.options.disableStdin = true;
 			terminal?.writeln(`\r\n\x1b[33m[Session ended (exit code: ${exitCode})]\x1b[0m`);
 		});
 
 		io.on('terminal:error', ({ message }: { message: string }) => {
 			status = 'error';
 			errorMsg = message;
+			if (terminal) terminal.options.disableStdin = true;
 			terminal?.writeln(`\r\n\x1b[31m[Error: ${message}]\x1b[0m`);
 		});
 	}
@@ -116,7 +114,6 @@
 		io.off('terminal:error');
 	}
 
-	// ── Connect ──────────────────────────────────────────────────────────
 	async function connect() {
 		if (!selectedContainer || !selectedDestinationId) return;
 		if (!terminal) await initTerminal();
@@ -134,6 +131,7 @@
 
 	function disconnect() {
 		io.emit('terminal:kill');
+		if (terminal) terminal.options.disableStdin = true;
 		status = 'idle';
 	}
 
@@ -142,7 +140,6 @@
 		setTimeout(handleResize, 50);
 	}
 
-	// ── Lifecycle ────────────────────────────────────────────────────────
 	onMount(async () => {
 		await loadContainers();
 		setupSocketListeners();
@@ -169,7 +166,7 @@
 		{#if loadingContainers}
 			<span class="text-sm text-gray-400">Loading containers…</span>
 		{:else if containers.length === 0}
-			<span class="text-sm text-yellow-400">No running containers found for this resource.</span>
+			<span class="text-sm text-yellow-400">No running containers found.</span>
 		{:else}
 			<select
 				class="select select-sm select-bordered bg-coolgray-200 max-w-xs"
@@ -184,28 +181,23 @@
 
 			{#if status === 'idle' || status === 'exited' || status === 'error'}
 				<button
-					class="btn btn-sm btn-primary gap-2"
+					class="btn btn-sm bg-coollabs gap-2"
 					disabled={!selectedContainer}
 					on:click={connect}
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 						<polyline points="4 17 10 11 4 5"/>
 						<line x1="12" y1="19" x2="20" y2="19"/>
 					</svg>
 					Connect
 				</button>
 			{:else if status === 'connecting'}
-				<button class="btn btn-sm btn-ghost gap-2" disabled>
-					<svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M21 12a9 9 0 11-6.219-8.56"/>
-					</svg>
+				<button class="btn btn-sm btn-ghost gap-2 loading" disabled>
 					Connecting…
 				</button>
 			{:else if status === 'connected'}
 				<button class="btn btn-sm btn-error gap-2" on:click={disconnect}>
 					<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 						<rect x="6" y="5" width="4" height="14" rx="1"/>
 						<rect x="14" y="5" width="4" height="14" rx="1"/>
 					</svg>
@@ -217,12 +209,10 @@
 				<button class="btn btn-sm btn-ghost" on:click={toggleFullscreen} title="Toggle fullscreen">
 					{#if fullscreen}
 						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 							<path d="M6 14h4m0 0v4m0-4l-6 6m14-10h-4m0 0V6m0 4l6-6"/>
 						</svg>
 					{:else}
 						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 							<path d="M4 8v-2a2 2 0 0 1 2 -2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1 -2 2h-2m-8 0h-2a2 2 0 0 1 -2 -2v-2"/>
 						</svg>
 					{/if}
@@ -238,18 +228,14 @@
 		class:inset-0={fullscreen}
 		class:z-50={fullscreen}
 		class="rounded overflow-hidden bg-black"
-		style={fullscreen ? '' : 'height: 500px;'}
+		style={fullscreen ? 'padding:1rem' : 'height:500px'}
 	>
 		<div bind:this={terminalEl} class="w-full h-full" />
 	</div>
 </div>
 
 <style>
-	/* xterm.js styles are imported dynamically — this fixes the terminal filling its container */
-	:global(.xterm) {
-		height: 100%;
-	}
-	:global(.xterm-viewport) {
-		overflow-y: auto !important;
-	}
+	:global(.xterm) { height: 100%; }
+	:global(.xterm-viewport) { overflow-y: auto !important; }
+	:global(.xterm-screen) { height: 100% !important; }
 </style>

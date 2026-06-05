@@ -1859,3 +1859,76 @@ export async function removeBranchDatabase(database: any, pullmergeRequestId: st
 		return errorHandler({ status, message });
 	}
 }
+
+export async function saveResourceLimits(request: FastifyRequest<{ Params: { id: string }; Body: { cpuLimit: string; memoryLimit: string } }>) {
+	try {
+		const { id } = request.params;
+		const { teamId } = request.user;
+		const { cpuLimit, memoryLimit } = request.body;
+
+		const application = await prisma.application.findFirst({
+			where: { id, teams: { some: { id: teamId === '0' ? undefined : teamId } } },
+			include: { destinationDocker: true }
+		});
+		if (!application) throw { status: 404, message: 'Application not found.' };
+
+		// Save to database
+		await prisma.application.update({
+			where: { id },
+			data: { cpuLimit: cpuLimit || null, memoryLimit: memoryLimit || null }
+		});
+
+		// Apply limits to running container
+		if (application.destinationDockerId) {
+			const containerName = id;
+			if (cpuLimit) {
+				await executeCommand({
+					dockerId: application.destinationDocker.id,
+					command: `docker update --cpus="${cpuLimit}" ${containerName}`
+				});
+			}
+			if (memoryLimit) {
+				await executeCommand({
+					dockerId: application.destinationDocker.id,
+					command: `docker update --memory="${memoryLimit}" --memory-swap="${memoryLimit}" ${containerName}`
+				});
+			}
+		}
+
+		return { message: 'Resource limits saved.' };
+	} catch ({ status, message }) {
+		return errorHandler({ status, message });
+	}
+}
+
+export async function removeResourceLimits(request: FastifyRequest<{ Params: { id: string } }>) {
+	try {
+		const { id } = request.params;
+		const { teamId } = request.user;
+
+		const application = await prisma.application.findFirst({
+			where: { id, teams: { some: { id: teamId === '0' ? undefined : teamId } } },
+			include: { destinationDocker: true }
+		});
+		if (!application) throw { status: 404, message: 'Application not found.' };
+
+		// Remove from database
+		await prisma.application.update({
+			where: { id },
+			data: { cpuLimit: null, memoryLimit: null }
+		});
+
+		// Remove limits from running container
+		if (application.destinationDockerId) {
+			const containerName = id;
+			await executeCommand({
+				dockerId: application.destinationDocker.id,
+				command: `docker update --cpus="0" --memory="0" --memory-swap="0" ${containerName}`
+			});
+		}
+
+		return { message: 'Resource limits removed.' };
+	} catch ({ status, message }) {
+		return errorHandler({ status, message });
+	}
+}

@@ -115,6 +115,52 @@
 	</li>
 	<li
 		class="rounded"
+		class:bg-coollabs={$page.url.pathname === `/applications/${$page.params.id}/resource`}
+	>
+		<a href={`/applications/${$page.params.id}/resource`} class="no-underline w-full"
+			><svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="w-6 h-6"
+				viewBox="0 0 24 24"
+				stroke-width="1.5"
+				stroke="currentColor"
+				fill="none"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+				<path d="M3 12h4l3 8l4 -16l3 8h4" />
+			</svg>Resource</a
+		>
+	</li>
+	<li
+		class="rounded"
+		class:text-stone-600={$status.application.overallStatus === 'stopped'}
+		class:bg-coollabs={$page.url.pathname === `/applications/${$page.params.id}/terminal`}
+	>
+		<a
+			href={$status.application.overallStatus !== 'stopped'
+				? `/applications/${$page.params.id}/terminal`
+				: ''}
+			class="no-underline w-full"
+			><svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="w-6 h-6"
+				viewBox="0 0 24 24"
+				stroke-width="1.5"
+				stroke="currentColor"
+				fill="none"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+				<polyline points="4 17 10 11 4 5" />
+				<line x1="12" y1="19" x2="20" y2="19" />
+			</svg>Terminal</a
+		>
+	</li>
+	<li
+		class="rounded"
 		class:bg-coollabs={$page.url.pathname === `/applications/${$page.params.id}/storages`}
 	>
 		<a href={`/applications/${$page.params.id}/storages`} class="no-underline w-full"
@@ -158,27 +204,6 @@
 		</li>
 	{/if}
 
-	<li class="menu-title">
-		<span>Terminal</span>
-	</li>
-	<li
-		class="rounded"
-		class:text-stone-600={$status.application.overallStatus === 'stopped'}
-		class:bg-coollabs={$page.url.pathname === `/applications/${$page.params.id}/terminal`}
-	>
-		<a
-			href={$status.application.overallStatus !== 'stopped'
-				? `/applications/${$page.params.id}/terminal`
-				: ''}
-			class="no-underline w-full"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-				<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-				<polyline points="4 17 10 11 4 5"/>
-				<line x1="12" y1="19" x2="20" y2="19"/>
-			</svg>Terminal
-		</a>
-	</li>
 	<li class="menu-title">
 		<span>Logs</span>
 	</li>
@@ -265,31 +290,7 @@
 			>
 		</li>
 	{/if}
-	<li
-		class="rounded"
-		class:text-stone-600={$status.application.overallStatus !== 'healthy'}
-		class:bg-coollabs={$page.url.pathname === `/applications/${$page.params.id}/usage`}
-	>
-		<a
-			href={$status.application.overallStatus === 'healthy'
-				? `/applications/${$page.params.id}/usage`
-				: ''}
-			class="no-underline w-full"
-			><svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="w-6 h-6"
-				viewBox="0 0 24 24"
-				stroke-width="1.5"
-				stroke="currentColor"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M3 12h4l3 8l4 -16l3 8h4" />
-			</svg>Monitoring</a
-		>
-	</li>
+
 	{#if !application.settings.isBot && application.gitSourceId}
 		<li
 			class="rounded"

@@ -49,6 +49,8 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     fastify.get<GetBuilds>('/:id/logs/build', async (request) => await getBuilds(request));
     fastify.get<GetBuildIdLogs>('/:id/logs/build/:buildId', async (request) => await getBuildIdLogs(request));
 
+    fastify.post('/:id/limits', { onRequest: [fastify.authenticate] }, async (request: any) => await saveResourceLimits(request))
+    fastify.delete('/:id/limits', { onRequest: [fastify.authenticate] }, async (request: any) => await removeResourceLimits(request))
     fastify.get('/:id/usage', async (request) => await getUsage(request))
     fastify.get('/:id/usage/:containerId', async (request) => await getUsageByContainer(request))
 
