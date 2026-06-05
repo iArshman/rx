@@ -9,6 +9,12 @@ RUN npm --no-update-notifier --no-fund --global install pnpm@${PNPM_VERSION}
 
 COPY . .
 RUN pnpm install
+# pnpm moves the compiled node-pty native addon to .ignored/ when it finds
+# prebuilds for other platforms. Copy the linux build into the correct location
+# so it survives into the production image.
+RUN mkdir -p /app/apps/api/node_modules/.pnpm/node-pty@1.1.0/node_modules/node-pty/build/Release && \
+    cp /app/apps/api/node_modules/.ignored/node-pty/build/Release/pty.node \
+       /app/apps/api/node_modules/.pnpm/node-pty@1.1.0/node_modules/node-pty/build/Release/pty.node
 RUN pnpm build
 
 # Production build
@@ -49,6 +55,8 @@ COPY --from=build /app/apps/api/templates.json .
 # Copy pre-built node_modules from build stage.
 # node-pty is a native addon compiled during build — must be copied, not reinstalled.
 COPY --from=build /app/apps/api/node_modules/ ./node_modules
+COPY --from=build /app/node_modules/.pnpm/prisma@4.8.1/node_modules/prisma/ ./node_modules/prisma/
+COPY --from=build /app/node_modules/.pnpm/@prisma+client@4.8.1_prisma@4.8.1/node_modules/@prisma/ ./node_modules/@prisma/
 
 EXPOSE 3000
 ENV CHECKPOINT_DISABLE=1
