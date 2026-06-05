@@ -137,6 +137,8 @@ model Application {
   simpleDockerfile           String?
   basicAuthUser              String?
   basicAuthPw                String?
+  cpuLimit                   String?
+  memoryLimit                String?
 
   persistentStorage  ApplicationPersistentStorage[]
   secrets            Secret[]
