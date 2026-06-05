@@ -1,3 +1,14 @@
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit';
+	export const load: Load = async ({ stuff }) => {
+		return {
+			props: {
+				application: stuff.application
+			}
+		};
+	};
+</script>
+
 <script lang="ts">
 	export let application: any;
 	import { page } from '$app/stores';
@@ -179,7 +190,7 @@
 			>
 				Save Limits
 			</button>
-			{#if application.cpuLimit || application.memoryLimit}
+			{#if application?.cpuLimit || application?.memoryLimit}
 				<button
 					class="btn btn-sm btn-error"
 					class:loading={removingLimits}
