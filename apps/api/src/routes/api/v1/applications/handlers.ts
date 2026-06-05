@@ -1878,20 +1878,30 @@ export async function saveResourceLimits(request: FastifyRequest<{ Params: { id:
 			data: { cpuLimit: cpuLimit || null, memoryLimit: memoryLimit || null }
 		});
 
-		// Apply limits to running container
+		// Apply limits to running container(s)
+		// For compose apps, multiple containers run under the same applicationId label
 		if (application.destinationDockerId) {
-			const containerName = id;
-			if (cpuLimit) {
-				await executeCommand({
-					dockerId: application.destinationDocker.id,
-					command: `docker update --cpus="${cpuLimit}" ${containerName}`
-				});
-			}
-			if (memoryLimit) {
-				await executeCommand({
-					dockerId: application.destinationDocker.id,
-					command: `docker update --memory="${memoryLimit}" --memory-swap="${memoryLimit}" ${containerName}`
-				});
+			const dockerId = application.destinationDocker.id;
+			const { stdout } = await executeCommand({
+				dockerId,
+				command: `docker ps --filter "label=coolify.applicationId=${id}" --format '{{.Names}}'`
+			});
+			const containers = stdout.trim().split('\n').filter(Boolean);
+			// Fall back to plain applicationId for non-compose apps
+			const targets = containers.length > 0 ? containers : [id];
+			for (const containerName of targets) {
+				if (cpuLimit) {
+					await executeCommand({
+						dockerId,
+						command: `docker update --cpus="${cpuLimit}" ${containerName}`
+					});
+				}
+				if (memoryLimit) {
+					await executeCommand({
+						dockerId,
+						command: `docker update --memory="${memoryLimit}" --memory-swap="${memoryLimit}" ${containerName}`
+					});
+				}
 			}
 		}
 
@@ -1918,13 +1928,22 @@ export async function removeResourceLimits(request: FastifyRequest<{ Params: { i
 			data: { cpuLimit: null, memoryLimit: null }
 		});
 
-		// Remove limits from running container
+		// Remove limits from running container(s)
+		// For compose apps, multiple containers run under the same applicationId label
 		if (application.destinationDockerId) {
-			const containerName = id;
-			await executeCommand({
-				dockerId: application.destinationDocker.id,
-				command: `docker update --cpus="0" --memory="0" --memory-swap="0" ${containerName}`
+			const dockerId = application.destinationDocker.id;
+			const { stdout } = await executeCommand({
+				dockerId,
+				command: `docker ps --filter "label=coolify.applicationId=${id}" --format '{{.Names}}'`
 			});
+			const containers = stdout.trim().split('\n').filter(Boolean);
+			const targets = containers.length > 0 ? containers : [id];
+			for (const containerName of targets) {
+				await executeCommand({
+					dockerId,
+					command: `docker update --cpus="0" --memory="0" --memory-swap="0" ${containerName}`
+				});
+			}
 		}
 
 		return { message: 'Resource limits removed.' };

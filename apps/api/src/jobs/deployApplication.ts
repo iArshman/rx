@@ -100,7 +100,9 @@ import * as buildpacks from '../lib/buildPacks';
 									persistentStorage,
 									exposePort,
 									simpleDockerfile,
-									dockerRegistry
+									dockerRegistry,
+									cpuLimit,
+									memoryLimit
 								} = application;
 								const { workdir } = await createDirectories({ repository: applicationId, buildId });
 								try {
@@ -204,7 +206,18 @@ import * as buildpacks from '../lib/buildPacks';
 														depends_on: [],
 														expose: [port],
 														...(exposePort ? { ports: [`${exposePort}:${port}`] } : {}),
-														...defaultComposeConfiguration(destinationDocker.network)
+														...defaultComposeConfiguration(destinationDocker.network),
+														...(cpuLimit || memoryLimit ? {
+															deploy: {
+																...defaultComposeConfiguration(destinationDocker.network).deploy,
+																resources: {
+																	limits: {
+																		...(cpuLimit ? { cpus: cpuLimit } : {}),
+																		...(memoryLimit ? { memory: memoryLimit } : {})
+																	}
+																}
+															}
+														} : {})
 													}
 												},
 												networks: {
@@ -310,7 +323,9 @@ import * as buildpacks from '../lib/buildPacks';
 								baseBuildImage,
 								deploymentType,
 								gitCommitHash,
-								dockerRegistry
+								dockerRegistry,
+								cpuLimit,
+								memoryLimit
 							} = application;
 
 							let {
@@ -748,7 +763,18 @@ import * as buildpacks from '../lib/buildPacks';
 														depends_on: [],
 														expose: [port],
 														...(exposePort ? { ports: [`${exposePort}:${port}`] } : {}),
-														...defaultComposeConfiguration(destinationDocker.network)
+														...defaultComposeConfiguration(destinationDocker.network),
+														...(cpuLimit || memoryLimit ? {
+															deploy: {
+																...defaultComposeConfiguration(destinationDocker.network).deploy,
+																resources: {
+																	limits: {
+																		...(cpuLimit ? { cpus: cpuLimit } : {}),
+																		...(memoryLimit ? { memory: memoryLimit } : {})
+																	}
+																}
+															}
+														} : {})
 													}
 												},
 												networks: {
