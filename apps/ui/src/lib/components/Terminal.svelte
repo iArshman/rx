@@ -84,6 +84,7 @@
 	function setupSocketListeners() {
 		io.on('terminal:ready', () => {
 			status = 'connected';
+			terminal?.clear();
 			if (terminal) terminal.options.disableStdin = false;
 			terminal?.focus();
 			fitAddon?.fit();
@@ -227,10 +228,12 @@
 		class:fixed={fullscreen}
 		class:inset-0={fullscreen}
 		class:z-50={fullscreen}
-		class="rounded overflow-hidden bg-black"
-		style={fullscreen ? 'padding:1rem' : 'height:500px'}
+		class="rounded-lg bg-coolgray-200 p-3"
+		style={fullscreen ? '' : 'height:500px'}
 	>
-		<div bind:this={terminalEl} class="w-full h-full" />
+		<div class="w-full h-full rounded overflow-hidden bg-black p-2">
+			<div bind:this={terminalEl} class="w-full h-full" />
+		</div>
 	</div>
 </div>
 
