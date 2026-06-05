@@ -84,6 +84,7 @@
 	function setupSocketListeners() {
 		io.on('terminal:ready', () => {
 			status = 'connected';
+			terminal?.clear();
 			if (terminal) terminal.options.disableStdin = false;
 			terminal?.focus();
 			fitAddon?.fit();
