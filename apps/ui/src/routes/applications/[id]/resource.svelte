@@ -20,9 +20,14 @@
 	async function getUsage() {
 		if (usageLoading) return;
 		usageLoading = true;
-		const data = await get(`/applications/${id}/usage/${selectedService}`);
-		usage = data.usage;
-		usageLoading = false;
+		try {
+			const data = await get(`/applications/${id}/usage/${selectedService}`);
+			usage = data.usage;
+		} catch (err) {
+			console.log('[v0] getUsage error:', err);
+		} finally {
+			usageLoading = false;
+		}
 	}
 
 	function normalizeDockerServices(services: any[]) {
