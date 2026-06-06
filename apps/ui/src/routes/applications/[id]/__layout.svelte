@@ -83,7 +83,7 @@
 	let forceDelete = false;
 	let stopping = false;
 	const { id } = $page.params;
-	$isDeploymentEnabled = checkIfDeploymentEnabledApplications(application);
+	$: $isDeploymentEnabled = checkIfDeploymentEnabledApplications(application);
 
 	async function deleteApplication(name: string, force: boolean) {
 		const sure = confirm($t('application.confirm_to_delete', { name }));
@@ -216,7 +216,9 @@
 		$isDeploymentEnabled = false;
 		clearInterval(statusInterval);
 	});
+	let mounted = false;
 	onMount(async () => {
+		mounted = true;
 		setLocation(application, settings);
 		$status.application.loading = false;
 		if ($isDeploymentEnabled) {
@@ -228,6 +230,16 @@
 			$status.application.initialLoading = false;
 		}
 	});
+
+	// When isDeploymentEnabled becomes true AFTER mount (e.g. after buildpack selection),
+	// start the status polling interval if it hasn't been started yet.
+	$: if (mounted && $isDeploymentEnabled && !statusInterval) {
+		getStatus().then(() => {
+			statusInterval = setInterval(async () => {
+				await getStatus();
+			}, 2000);
+		});
+	}
 </script>
 
 <div class="mx-auto max-w-screen-2xl px-6 grid grid-cols-1 lg:grid-cols-2">
