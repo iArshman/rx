@@ -123,7 +123,7 @@ export async function checkUpdate(request: FastifyRequest) {
 		const { default: got } = await import('got');
 		const currentVersion = version;
 		const response = await got
-			.get('https://raw.githubusercontent.com/iarshman/rexify/main/version.json')
+			.get('https://raw.githubusercontent.com/iarshman/coolify/main/version.json')
 			.json<any>();
 		const latestVersion = response.version;
 		const isUpdateAvailable = compareVersions(latestVersion, currentVersion) === 1;
@@ -140,21 +140,12 @@ export async function checkUpdate(request: FastifyRequest) {
 export async function update(request: FastifyRequest<Update>) {
 	try {
 		if (!isDev) {
-			console.log('Manual update triggered - pulling latest from GitHub...');
+			const repoDir = process.env['COOLIFY_REPO_DIR'];
+			if (!repoDir) throw { status: 500, message: 'COOLIFY_REPO_DIR not set in .env' };
+			console.log(`Manual update triggered - repo: ${repoDir}`);
 			await executeCommand({
 				shell: true,
-				command: `cd /home/ubuntu/rexify && git pull origin main`
-			});
-			console.log('Building new Docker image...');
-			await executeCommand({
-				shell: true,
-				command: `cd /home/ubuntu/rexify && docker build -t my-coolify:latest .`
-			});
-			console.log('Restarting Coolify with new image...');
-			await executeCommand({ shell: true, command: `ls .env || env | grep "^COOLIFY" | sort > .env` });
-			await executeCommand({
-				shell: true,
-				command: `docker run --rm -tid --env-file .env -v /var/run/docker.sock:/var/run/docker.sock -v coolify-db:/app/db my-coolify:latest /bin/sh -c "env | grep '^COOLIFY' > .env && docker stop -t 0 coolify coolify-fluentbit && docker rm coolify coolify-fluentbit && docker compose up -d --force-recreate"`
+				command: `nohup bash -c "cd ${repoDir} && git pull origin main && docker build -t coolify:latest . && docker compose up -d --no-deps --force-recreate coolify && sleep 10 && docker exec coolify pnpm prisma db push" > /tmp/coolify-update.log 2>&1 &`
 			});
 			return {};
 		} else {
