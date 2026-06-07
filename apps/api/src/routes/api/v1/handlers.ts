@@ -123,7 +123,7 @@ export async function checkUpdate(request: FastifyRequest) {
 		const { default: got } = await import('got');
 		const currentVersion = version;
 		const response = await got
-			.get('https://raw.githubusercontent.com/iarshman/coolify/main/version.json')
+			.get('https://raw.githubusercontent.com/iarshman/rexify/main/version.json')
 			.json<any>();
 		const latestVersion = response.version;
 		const isUpdateAvailable = compareVersions(latestVersion, currentVersion) === 1;
