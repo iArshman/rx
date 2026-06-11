@@ -49,5 +49,8 @@
     "netlify",
     "open-source",
     "coolify"
-  ]
+  ],
+  "dependencies": {
+    "@sveltejs/kit": "1.0.0-next.405"
+  }
 }
