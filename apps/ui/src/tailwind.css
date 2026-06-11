@@ -27,15 +27,12 @@ body {
 	@apply min-h-screen overflow-x-hidden bg-coolblack text-sm text-white scrollbar-w-1 scrollbar-thumb-coollabs scrollbar-track-coolgray-200;
 }
 
-.section-frame {
-	@apply mt-8 block rounded-xl border border-coolgray-400 bg-coolgray-100 bg-opacity-30 p-4 lg:p-6;
-}
-
 input, .input {
 	@apply h-12 w-96 rounded border border-transparent bg-coolgray-200 p-2 text-xs tracking-tight text-white placeholder-stone-600 outline-none transition duration-150 hover:bg-coolgray-500 focus:bg-coolgray-500 disabled:border disabled:border-dashed disabled:border-coolgray-200 disabled:bg-transparent disabled:bg-coolblack md:text-sm;
 }
 textarea {
-	@apply min-w-[14rem] rounded border border-transparent bg-coolgray-200 p-2 text-xs tracking-tight text-white placeholder-stone-600 outline-none transition duration-150 hover:bg-coolgray-500 focus:bg-coolgray-500 disabled:border disabled:border-dashed disabled:border-coolgray-200 disabled:bg-transparent md:text-sm;
+	min-width: 14rem;
+	@apply rounded border border-transparent bg-coolgray-200 p-2 text-xs tracking-tight text-white placeholder-stone-600 outline-none transition duration-150 hover:bg-coolgray-500 focus:bg-coolgray-500 disabled:border disabled:border-dashed disabled:border-coolgray-200 disabled:bg-transparent md:text-sm;
 }
 
 #svelte .custom-select-wrapper .selectContainer.disabled input {
@@ -141,7 +138,8 @@ a {
 .menu-top .menu-bar > * {display: flex; flex-direction: row;}
 
 .nav-main {
-	@apply fixed top-0 left-0 min-h-screen w-16 min-w-[4rem] overflow-hidden border-r border-stone-800 bg-coolgray-200 scrollbar-w-1  scrollbar-thumb-coollabs scrollbar-track-coolgray-200 xl:overflow-visible;
+	@apply fixed top-0 left-0 min-h-screen w-16 overflow-hidden border-r border-stone-800 bg-coolgray-200 scrollbar-w-1  scrollbar-thumb-coollabs scrollbar-track-coolgray-200 xl:overflow-visible;
+	min-width: 1rem;
 }
 
 .nav-side {
@@ -194,7 +192,8 @@ a {
 }
 
 .box-selection {
-	@apply min-w-[16rem]  justify-center rounded border-transparent bg-coolgray-200 p-6 hover:border-transparent hover:bg-coolgray-400;
+	min-width: 16rem;
+	@apply justify-center rounded border-transparent bg-coolgray-200 p-6 hover:border-transparent hover:bg-coolgray-400;
 }
 
 .lds-heart {
@@ -243,7 +242,9 @@ a {
 	@apply flex flex-row  z-10 w-full py-5 px-5;
 }
 .burger {
-	@apply block m-[2px] h-[3px] w-5 rounded
+	@apply block w-5 rounded;
+	margin: 2px;
+	height: 3px;
 }
 
 .bg-coollabs-gradient {
