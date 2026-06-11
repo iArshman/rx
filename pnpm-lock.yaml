@@ -14,6 +14,9 @@ importers:
       '@sveltejs/kit':
         specifier: 1.0.0-next.405
         version: 1.0.0-next.405(svelte@3.53.1)(vite@3.2.4(@types/node@18.11.18)(sass@1.100.0))
+      fastify:
+        specifier: 4.11.0
+        version: 4.11.0
     devDependencies:
       cross-var:
         specifier: 1.1.0

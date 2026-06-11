@@ -51,7 +51,8 @@
     "coolify"
   ],
   "dependencies": {
-    "@sveltejs/kit": "1.0.0-next.405"
+    "@sveltejs/kit": "1.0.0-next.405",
+    "fastify": "4.11.0"
   },
   "pnpm": {
     "overrides": {
