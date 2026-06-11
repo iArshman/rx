@@ -27,6 +27,10 @@ body {
 	@apply min-h-screen overflow-x-hidden bg-coolblack text-sm text-white scrollbar-w-1 scrollbar-thumb-coollabs scrollbar-track-coolgray-200;
 }
 
+.section-frame {
+	@apply mt-8 block rounded-xl border border-coolgray-400 bg-coolgray-100 bg-opacity-30 p-4 lg:p-6;
+}
+
 input, .input {
 	@apply h-12 w-96 rounded border border-transparent bg-coolgray-200 p-2 text-xs tracking-tight text-white placeholder-stone-600 outline-none transition duration-150 hover:bg-coolgray-500 focus:bg-coolgray-500 disabled:border disabled:border-dashed disabled:border-coolgray-200 disabled:bg-transparent disabled:bg-coolblack md:text-sm;
 }
