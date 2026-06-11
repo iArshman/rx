@@ -1360,9 +1360,3 @@
 	{/if}
 </div>
 <div class="mb-20" />
-
-<style lang="postcss">
-	.section-frame {
-		@apply mt-8 rounded-xl border border-coolgray-400 bg-coolgray-100 bg-opacity-30 p-4 lg:p-6;
-	}
-</style>
