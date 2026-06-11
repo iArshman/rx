@@ -540,8 +540,8 @@
 			</label>
 		</div>
 	{/if}
-	{#if filtered.applications.length > 0 && applications.length > 0}
-		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #202020; padding: 1rem;">
+	{#if !showOtherTeams && filtered.applications.length > 0 && applications.length > 0}
+		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #000000; padding: 1rem;">
 			<div class="flex flex-wrap items-center gap-2">
 				<h1 class="title lg:text-3xl">Applications</h1>
 				<button class="btn btn-sm btn-primary" on:click={refreshStatusApplications}
@@ -674,8 +674,8 @@
 			</div>
 		</section>
 	{/if}
-	{#if filtered.services.length > 0 && services.length > 0}
-		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #202020; padding: 1rem;">
+	{#if !showOtherTeams && filtered.services.length > 0 && services.length > 0}
+		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #000000; padding: 1rem;">
 			<div class="flex flex-wrap items-center gap-2">
 				<h1 class="title lg:text-3xl">Services</h1>
 				<button class="btn btn-sm btn-primary" on:click={refreshStatusServices}
@@ -771,8 +771,8 @@
 			</div>
 		</section>
 	{/if}
-	{#if filtered.databases.length > 0 && databases.length > 0}
-		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #202020; padding: 1rem;">
+	{#if !showOtherTeams && filtered.databases.length > 0 && databases.length > 0}
+		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #000000; padding: 1rem;">
 			<div class="flex flex-wrap items-center gap-2">
 				<h1 class="title lg:text-3xl">Databases</h1>
 				<button class="btn btn-sm btn-primary" on:click={refreshStatusDatabases}
@@ -869,7 +869,7 @@
 		</section>
 	{/if}
 	{#if showOtherTeams && (filtered.otherApplications.length > 0 || filtered.otherServices.length > 0 || filtered.otherDatabases.length > 0 || filtered.otherGitSources.length > 0 || filtered.otherDestinations.length > 0)}
-		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #202020; padding: 1rem;">
+		<section style="margin-top: 2rem; border-radius: 0.75rem; border: 1px solid #282828; background-color: #000000; padding: 1rem;">
 			<div class="flex flex-wrap items-center gap-2">
 				<h1 class="title lg:text-3xl">Other Teams</h1>
 			</div>
