@@ -14,9 +14,24 @@ importers:
       '@sveltejs/kit':
         specifier: 1.0.0-next.405
         version: 1.0.0-next.405(svelte@3.53.1)(vite@3.2.4(@types/node@18.11.18)(sass@1.100.0))
+      bcryptjs:
+        specifier: 2.4.3
+        version: 2.4.3
+      compare-versions:
+        specifier: 5.0.1
+        version: 5.0.1
+      cuid:
+        specifier: 2.1.8
+        version: 2.1.8
       fastify:
         specifier: 4.11.0
         version: 4.11.0
+      got:
+        specifier: 12.5.3
+        version: 12.5.3
+      js-yaml:
+        specifier: 4.1.0
+        version: 4.1.0
     devDependencies:
       cross-var:
         specifier: 1.1.0

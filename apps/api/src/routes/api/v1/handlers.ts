@@ -263,7 +263,7 @@ export async function login(request: FastifyRequest<Login>, reply: FastifyReply)
 	if (request.user) {
 		return reply.redirect('/dashboard');
 	} else {
-		const { email, password, isLogin } = request.body || {};
+		const { email, password, isLogin, name } = request.body || {};
 		if (!email || !password) {
 			throw { status: 500, message: 'Email and password are required.' };
 		}
@@ -343,6 +343,7 @@ export async function login(request: FastifyRequest<Login>, reply: FastifyReply)
 				};
 			}
 			const hashedPassword = await hashPassword(password);
+			const teamName = name?.trim() || uniqueName();
 			if (users === 0) {
 				await prisma.user.create({
 					data: {
@@ -353,7 +354,7 @@ export async function login(request: FastifyRequest<Login>, reply: FastifyReply)
 						teams: {
 							create: {
 								id: uid,
-								name: uniqueName(),
+								name: teamName,
 								destinationDocker: { connect: { network: 'coolify' } }
 							}
 						},
@@ -371,7 +372,7 @@ export async function login(request: FastifyRequest<Login>, reply: FastifyReply)
 						teams: {
 							create: {
 								id: uid,
-								name: uniqueName()
+								name: teamName
 							}
 						},
 						permission: { create: { teamId: uid, permission: 'owner' } }
